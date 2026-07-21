@@ -5,7 +5,7 @@ export const getAllUsers = createAsyncThunk(
   "user/getAll",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const res = await Api.get("/api/users", { params });
+      const res = await Api.get("/api/superadmin/users", { params });
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch users");
@@ -17,7 +17,7 @@ export const toggleUserStatus = createAsyncThunk(
   "user/toggleStatus",
   async (userId, { rejectWithValue }) => {
     try {
-      const res = await Api.put(`/api/users/${userId}/toggle-status`);
+      const res = await Api.put(`/api/superadmin/users/${userId}/toggle-status`);
       return { res: res.data, userId };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to toggle status");

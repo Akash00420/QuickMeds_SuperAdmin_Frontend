@@ -23,15 +23,22 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
+
         <Route path="/admin-manager" element={<AdminManager />} />
+        <Route path="/admins" element={<AdminManager />} /> {/* ✅ alias */}
+
+        <Route path="/pharmacy-control" element={<PharmacyControl />} />
+        <Route path="/pharmacies" element={<PharmacyControl />} /> {/* ✅ alias */}
+
+        <Route path="/user-control" element={<UserControl />} />
+        <Route path="/users" element={<UserControl />} /> {/* ✅ alias, for consistency */}
+
         <Route path="/audit-logs" element={<AuditLogs />} />
         <Route path="/billing" element={<BillingPanel />} />
         <Route path="/feature-flags" element={<FeatureFlags />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/outbreak-monitor" element={<OutbreakMonitor />} />
-        <Route path="/pharmacy-control" element={<PharmacyControl />} />
         <Route path="/system-health" element={<SystemHealth />} />
-        <Route path="/user-control" element={<UserControl />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
