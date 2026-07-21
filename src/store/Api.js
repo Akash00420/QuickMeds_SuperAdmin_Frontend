@@ -1,35 +1,22 @@
 import axios from "axios";
 
 const Api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
-  headers: { "Content-Type": "application/json" },
+  baseURL: "http://localhost:5000", // your backend URL
 });
 
-// =========================
-// ✅ REQUEST INTERCEPTOR
-// =========================
-Api.interceptors.request.use(
-  (config) => {
-    const stored = sessionStorage.getItem("quickmeds_superadmin_token");
-    const token  = stored ? JSON.parse(stored)?.token : null;
-    if (token) config.headers.Authorization = `Bearer ${token}`;
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// =========================
-// ✅ RESPONSE INTERCEPTOR
-// =========================
-Api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      sessionStorage.removeItem("quickmeds_superadmin_token");
-      window.location.href = "/login";
+Api.interceptors.request.use((config) => {
+  try {
+    const raw = sessionStorage.getItem("quickmeds_superadmin_token");
+    if (raw && raw !== "undefined") {
+      const { token } = JSON.parse(raw);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
-    return Promise.reject(error);
+  } catch {
+    sessionStorage.removeItem("quickmeds_superadmin_token");
   }
-);
+  return config;
+});
 
 export default Api;

@@ -1,6 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Api from "../store/Api";
 
+// ✅ Safely read persisted session (guards against "undefined" string / corrupted JSON)
+const getStoredSession = () => {
+  try {
+    const raw = sessionStorage.getItem("quickmeds_superadmin_token");
+    if (!raw || raw === "undefined") return { token: null, role: null };
+    return JSON.parse(raw);
+  } catch {
+    sessionStorage.removeItem("quickmeds_superadmin_token");
+    return { token: null, role: null };
+  }
+};
+
+const stored = getStoredSession();
+
 export const loginSuperAdmin = createAsyncThunk(
   "auth/loginSuperAdmin",
   async (data, { rejectWithValue }) => {
@@ -40,8 +54,8 @@ const AuthSlice = createSlice({
   name: "auth",
   initialState: {
     user:            null,
-    token:           null,
-    isAuthenticated: false,
+    token:           stored.token,           // ✅ rehydrated
+    isAuthenticated: !!stored.token,          // ✅ rehydrated
     loading:         false,
     error:           null,
   },
@@ -63,9 +77,7 @@ const AuthSlice = createSlice({
         state.user            = action.payload.user;
         state.isAuthenticated = true;
       })
-      .addCase(loginSuperAdmin.rejected,  (state, action) => { state.loading = false; state.error = action.payload; });
-
-    builder
+      .addCase(loginSuperAdmin.rejected,  (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(getSuperAdminProfile.fulfilled, (state, action) => {
         state.user = action.payload.data?.user;
       });
