@@ -7,6 +7,7 @@ import { getAllPharmacies } from "../Reducer/PharmacySlice";
 import { getAllUsers } from "../Reducer/UserSlice";
 import Loader from "../components/Loader";
 import StatCard from "../components/StatCard";
+import BackButton from "../components/BackButton";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -31,8 +32,19 @@ const Dashboard = () => {
   const pendingVerify   = pharmacies.filter((p) => !p.isVerified).length;
   const activeAdmins    = admins.filter((a) => a.isActive).length;
 
+  // One row per pharmacy owner (dedup in case an owner has multiple pharmacies)
+  const pharmacyOwners = Array.from(
+    new Map(
+      pharmacies
+        .filter((p) => p.owner)
+        .map((p) => [p.owner._id || p.owner.email, p])
+    ).values()
+  );
+
   return (
     <div className="sa-main">
+      <BackButton />
+
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em" }}>
           Platform Overview 🛡️
@@ -51,8 +63,8 @@ const Dashboard = () => {
         <StatCard icon="🧪" label="Outbreak Alerts" value={platformStats?.outbreakAlerts ?? "—"} sub="This month" iconClass="icon-red" />
       </div>
 
-      {/* Two-column section */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      {/* Three-column section */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
 
         {/* Pending pharmacies */}
         <div>
@@ -84,6 +96,43 @@ const Dashboard = () => {
                   <tr>
                     <td colSpan={3} style={{ textAlign: "center", color: "#94A3B8", padding: 24 }}>
                       All pharmacies verified ✅
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Pharmacy owners */}
+        <div>
+          <div className="section-header">
+            <div className="section-title">Pharmacy Owners</div>
+            <button className="btn btn-ghost btn-sm" onClick={() => navigate("/pharmacies")}>
+              Manage →
+            </button>
+          </div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Status</th></tr></thead>
+              <tbody>
+                {pharmacyOwners.slice(0, 5).map((p) => (
+                  <tr key={p.owner._id || p.owner.email}>
+                    <td>
+                      <div style={{ fontWeight: 600 }}>{p.owner.name}</div>
+                      <div className="text-sm text-muted">{p.owner.email}</div>
+                    </td>
+                    <td>
+                      <span className={`badge ${p.isActive ? "badge-green" : "badge-red"}`}>
+                        {p.isActive ? "Active" : "Suspended"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {pharmacyOwners.length === 0 && (
+                  <tr>
+                    <td colSpan={2} style={{ textAlign: "center", color: "#94A3B8", padding: 24 }}>
+                      No pharmacy owners yet
                     </td>
                   </tr>
                 )}

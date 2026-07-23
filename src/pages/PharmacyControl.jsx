@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllPharmacies } from "../Reducer/PharmacySlice";
 import PharmacyRow from "../components/PharmacyRow";
 import Loader from "../components/Loader";
+import BackButton from "../components/BackButton";
 
 const PharmacyControl = () => {
   const dispatch = useDispatch();
@@ -26,6 +27,8 @@ const PharmacyControl = () => {
 
   return (
     <div className="sa-main">
+      <BackButton to="/dashboard" />
+
       <div className="page-header">
         <div>
           <div className="page-title">Pharmacy Control</div>

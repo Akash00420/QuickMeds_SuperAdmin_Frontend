@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllAdmins, createAdmin, clearGeneratedPassword } from "../Reducer/AdminSlice";
 import AdminCard from "../components/AdminCard";
 import Loader from "../components/Loader";
+import BackButton from "../components/BackButton";
 
 const INITIAL = { name: "", email: "", phone: "" };
 
@@ -25,6 +26,8 @@ const AdminManager = () => {
 
   return (
     <div className="sa-main">
+      <BackButton to="/dashboard" />
+
       <div className="page-header">
         <div>
           <div className="page-title">Admin Accounts</div>
