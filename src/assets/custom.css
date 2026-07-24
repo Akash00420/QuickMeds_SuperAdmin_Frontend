@@ -447,3 +447,209 @@ tr:hover td { background: #FAFBFC; }
 @media (max-width: 480px) {
   .stat-grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   MOBILE APP-SHELL ADDITIONS
+   (top bar, bottom tab nav, hero banner, chips, pharmacy cards
+   used by the redesigned Dashboard / PharmacyControl pages)
+   ============================================================ */
+
+/* ── APP SHELL / TOP BAR ──────────────────────────────────── */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #F8FAFC;
+  padding-bottom: 74px; /* room for bottom nav */
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: white;
+  border-bottom: 1px solid #E2E8F0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+}
+
+.app-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: #1E293B; color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+}
+
+.app-brand-name { font-size: 15px; font-weight: 700; color: #1E293B; }
+
+.app-settings-btn {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: none; border: none; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  color: #64748B;
+}
+.app-settings-btn:hover { background: #F1F5F9; }
+
+.app-body { flex: 1; }
+
+/* ── BOTTOM TAB NAV ───────────────────────────────────────── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; background: white;
+  border-top: 1px solid #E2E8F0;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  padding: 9px 4px 8px;
+  font-size: 10px; font-weight: 600;
+  color: #94A3B8; position: relative;
+}
+
+.bottom-nav-icon { font-size: 18px; }
+
+.bottom-nav-item.active {
+  color: #0F6E56;
+}
+.bottom-nav-item.active .bottom-nav-icon {
+  background: #E1F5EE;
+  border-radius: 8px;
+  padding: 2px 10px;
+}
+
+.bottom-nav-dot {
+  position: absolute; top: 6px; right: calc(50% - 16px);
+  width: 7px; height: 7px; border-radius: 50%; background: #E24B4A;
+}
+
+/* ── HERO BANNER ──────────────────────────────────────────── */
+.hero-banner {
+  background: #1E293B;
+  border-radius: 14px;
+  padding: 22px 22px;
+  margin-bottom: 20px;
+}
+.hero-banner-title { color: white; font-size: 18px; font-weight: 700; }
+.hero-banner-sub   { color: #94A3B8; font-size: 12px; margin-top: 4px; }
+
+/* ── STAT GRID (2-col mobile variant) ─────────────────────── */
+.stat-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.stat-card-accent { border-left: 3px solid #1D9E75; }
+
+/* ── OUTBREAK ROW ─────────────────────────────────────────── */
+.outbreak-row {
+  background: white; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 14px 18px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* ── SECTION BLOCK CARD ───────────────────────────────────── */
+.section-block {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.verified-check {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: #E1F5EE; color: #0F6E56;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin: 0 auto 10px;
+}
+
+.fab-btn {
+  position: absolute; bottom: -14px; right: 14px;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: #1E293B; color: white; border: none;
+  font-size: 20px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+}
+
+/* ── MINI LIST (admin / owner rows on dashboard) ──────────── */
+.admin-mini-list { display: flex; flex-direction: column; gap: 4px; }
+
+.admin-mini-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 4px;
+  border-bottom: 1px solid #F1F5F9;
+}
+.admin-mini-row:last-child { border-bottom: none; }
+
+.admin-avatar-circle {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #EEF2FF; color: #4338CA;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.owner-avatar { background: #E1F5EE; color: #0F6E56; }
+
+/* ── FILTER CHIPS ─────────────────────────────────────────── */
+.chip-row {
+  display: flex; gap: 8px; margin-bottom: 18px;
+  overflow-x: auto; padding-bottom: 2px;
+}
+.chip {
+  flex-shrink: 0;
+  padding: 7px 14px; border-radius: 99px;
+  font-size: 12px; font-weight: 600;
+  border: 1.5px solid #E2E8F0; background: white; color: #475569;
+  white-space: nowrap;
+}
+.chip.active {
+  background: #1E293B; color: white; border-color: #1E293B;
+}
+
+/* ── NETWORK SUMMARY STRIP ────────────────────────────────── */
+.network-strip {
+  display: flex; gap: 10px; margin-bottom: 18px;
+  overflow-x: auto;
+}
+.network-strip-item {
+  flex: 1; min-width: 90px;
+  background: white; border: 1px solid #E2E8F0; border-radius: 10px;
+  padding: 10px 12px; text-align: center;
+}
+.network-strip-value { font-size: 17px; font-weight: 700; }
+.network-strip-label { font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+/* ── PHARMACY CARD ────────────────────────────────────────── */
+.pharmacy-card {
+  background: white; border: 1px solid #E2E8F0; border-left: 4px solid #CBD5E1;
+  border-radius: 12px; padding: 16px 18px; margin-bottom: 12px;
+}
+.pharmacy-card.status-verified  { border-left-color: #1D9E75; }
+.pharmacy-card.status-pending   { border-left-color: #EF9F27; }
+.pharmacy-card.status-suspended { border-left-color: #E24B4A; }
+
+.pharmacy-card-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.pharmacy-card-name { font-size: 14px; font-weight: 700; }
+.pharmacy-card-loc  { font-size: 12px; color: #64748B; margin-top: 2px; }
+.pharmacy-card-status-badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+
+.pharmacy-card-meta {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 12px;
+}
+.pharmacy-card-meta-label { font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.04em; }
+.pharmacy-card-meta-value { font-size: 12px; font-weight: 600; margin-top: 2px; }
+
+.pharmacy-card-actions { display: flex; gap: 8px; }
+.pharmacy-card-actions .btn { flex: 1; justify-content: center; }

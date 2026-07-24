@@ -6,13 +6,13 @@ import { getAllAdmins } from "../Reducer/AdminSlice";
 import { getAllPharmacies } from "../Reducer/PharmacySlice";
 import { getAllUsers } from "../Reducer/UserSlice";
 import Loader from "../components/Loader";
-import StatCard from "../components/StatCard";
-import BackButton from "../components/BackButton";
+
+const initials = (name = "") =>
+  name.split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((s) => s.auth);
   const { platformStats, loading } = useSelector((s) => s.analytics);
   const { admins }     = useSelector((s) => s.admin);
   const { pharmacies } = useSelector((s) => s.pharmacy);
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
   const totalUsers      = platformStats?.totalUsers      ?? users.length;
   const totalPharmacies = platformStats?.totalPharmacies ?? pharmacies.length;
-  const pendingVerify   = pharmacies.filter((p) => !p.isVerified).length;
+  const pendingVerify   = pharmacies.filter((p) => !p.isVerified);
   const activeAdmins    = admins.filter((a) => a.isActive).length;
 
   // One row per pharmacy owner (dedup in case an owner has multiple pharmacies)
@@ -43,42 +43,80 @@ const Dashboard = () => {
 
   return (
     <div className="sa-main">
-      <BackButton />
-
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: "-0.02em" }}>
-          Platform Overview 🛡️
-        </h1>
-        <p className="page-subtitle">
-          Welcome back, {user?.name?.split(" ")[0] || "SuperAdmin"}
-        </p>
+      {/* Hero */}
+      <div className="hero-banner">
+        <div className="hero-banner-title">Overview Dashboard</div>
+        <div className="hero-banner-sub">System performance &amp; management</div>
       </div>
 
-      {/* Stats */}
-      <div className="stat-grid">
-        <StatCard icon="👥" label="Total Users"     value={totalUsers}      sub="Registered accounts"        iconClass="icon-blue" />
-        <StatCard icon="🏥" label="Pharmacies"      value={totalPharmacies} sub={`${pendingVerify} pending`} iconClass="icon-teal" />
-        <StatCard icon="🛡️" label="Active Admins"   value={activeAdmins}    sub={`${admins.length} total`}   iconClass="icon-indigo" />
-        <StatCard icon="⚠️" label="Pending Verify"  value={pendingVerify}   sub="Awaiting approval"          iconClass="icon-amber" />
-        <StatCard icon="🧪" label="Outbreak Alerts" value={platformStats?.outbreakAlerts ?? "—"} sub="This month" iconClass="icon-red" />
-      </div>
+      {/* Stats — 2x2 */}
+      <div className="stat-grid stat-grid-2">
+        <div className="stat-card">
+          <div className="stat-icon icon-blue">👥</div>
+          <div className="stat-label">Total Users</div>
+          <div className="stat-value">{totalUsers}</div>
+        </div>
 
-      {/* Three-column section */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
+        <div className="stat-card stat-card-accent">
+          <div className="stat-icon icon-teal">🏥</div>
+          <div className="stat-label">Pharmacies</div>
+          <div className="stat-value">{totalPharmacies}</div>
+        </div>
 
-        {/* Pending pharmacies */}
-        <div>
-          <div className="section-header">
-            <div className="section-title">Pending Verifications</div>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate("/pharmacies")}>
-              View all →
-            </button>
+        <div className="stat-card">
+          <div className="stat-icon icon-indigo">🛡️</div>
+          <div className="stat-label">Admins</div>
+          <div className="stat-value">{admins.length}</div>
+          <div className="stat-sub">
+            {admins.length > 0 && activeAdmins === admins.length ? "All Active" : `${activeAdmins} active`}
           </div>
-          <div className="table-wrap">
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon icon-amber">🛡️</div>
+          <div className="stat-label">Pending</div>
+          <div
+            className="stat-value"
+            style={{ color: pendingVerify.length ? "#A32D2D" : "#0F6E56" }}
+          >
+            {pendingVerify.length}
+          </div>
+          <div className="stat-sub">{pendingVerify.length === 0 ? "Verified" : "Awaiting review"}</div>
+        </div>
+      </div>
+
+      {/* Outbreak alerts */}
+      <div className="outbreak-row">
+        <div className="flex items-center gap-3">
+          <span className="stat-icon icon-gray" style={{ marginBottom: 0 }}>⚠️</span>
+          <div style={{ fontWeight: 600, fontSize: 13 }}>Outbreak Alerts</div>
+        </div>
+        <div className="text-sm text-muted">
+          {platformStats?.outbreakAlerts ? `${platformStats.outbreakAlerts} active` : "No active reports"}
+        </div>
+      </div>
+
+      {/* Pending verifications */}
+      <div className="card section-block">
+        <div className="section-header">
+          <div className="section-title">Pending Verifications</div>
+          <span className="stat-icon icon-indigo" style={{ marginBottom: 0, width: 30, height: 30, fontSize: 14 }}>
+            🛡️
+          </span>
+        </div>
+
+        {pendingVerify.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "28px 8px" }}>
+            <div className="verified-check">✓</div>
+            <div className="empty-state-title">All pharmacies verified</div>
+            <div className="empty-state-sub">System state is current and compliant.</div>
+          </div>
+        ) : (
+          <div className="table-wrap" style={{ marginTop: 12 }}>
             <table>
-              <thead><tr><th>Pharmacy</th><th>Owner</th><th>Action</th></tr></thead>
+              <thead><tr><th>Pharmacy</th><th>Owner</th><th></th></tr></thead>
               <tbody>
-                {pharmacies.filter((p) => !p.isVerified).slice(0, 5).map((p) => (
+                {pendingVerify.slice(0, 5).map((p) => (
                   <tr key={p._id}>
                     <td>
                       <div style={{ fontWeight: 600 }}>{p.name}</div>
@@ -92,90 +130,79 @@ const Dashboard = () => {
                     </td>
                   </tr>
                 ))}
-                {pharmacies.filter((p) => !p.isVerified).length === 0 && (
-                  <tr>
-                    <td colSpan={3} style={{ textAlign: "center", color: "#94A3B8", padding: 24 }}>
-                      All pharmacies verified ✅
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
-        </div>
+        )}
 
-        {/* Pharmacy owners */}
-        <div>
-          <div className="section-header">
-            <div className="section-title">Pharmacy Owners</div>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate("/pharmacies")}>
-              Manage →
-            </button>
-          </div>
-          <div className="table-wrap">
-            <table>
-              <thead><tr><th>Name</th><th>Status</th></tr></thead>
-              <tbody>
-                {pharmacyOwners.slice(0, 5).map((p) => (
-                  <tr key={p.owner._id || p.owner.email}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{p.owner.name}</div>
-                      <div className="text-sm text-muted">{p.owner.email}</div>
-                    </td>
-                    <td>
-                      <span className={`badge ${p.isActive ? "badge-green" : "badge-red"}`}>
-                        {p.isActive ? "Active" : "Suspended"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {pharmacyOwners.length === 0 && (
-                  <tr>
-                    <td colSpan={2} style={{ textAlign: "center", color: "#94A3B8", padding: 24 }}>
-                      No pharmacy owners yet
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <button className="fab-btn" onClick={() => navigate("/pharmacies")} title="Go to Pharmacies">
+          +
+        </button>
+      </div>
 
-        {/* Admin accounts */}
-        <div>
-          <div className="section-header">
-            <div className="section-title">Admin Accounts</div>
-            <button className="btn btn-ghost btn-sm" onClick={() => navigate("/admins")}>
-              Manage →
-            </button>
-          </div>
-          <div className="table-wrap">
-            <table>
-              <thead><tr><th>Name</th><th>Status</th></tr></thead>
-              <tbody>
-                {admins.slice(0, 5).map((a) => (
-                  <tr key={a._id}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{a.name}</div>
-                      <div className="text-sm text-muted">{a.email}</div>
-                    </td>
-                    <td>
-                      <span className={`badge ${a.isActive ? "badge-green" : "badge-red"}`}>
-                        {a.isActive ? "Active" : "Suspended"}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {admins.length === 0 && (
-                  <tr>
-                    <td colSpan={2} style={{ textAlign: "center", color: "#94A3B8", padding: 24 }}>
-                      No admins yet
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+      {/* Admin accounts */}
+      <div className="card section-block">
+        <div className="section-header">
+          <div className="section-title">Admin Accounts</div>
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{ textTransform: "uppercase", fontSize: 11 }}
+            onClick={() => navigate("/admins")}
+          >
+            View all
+          </button>
+        </div>
+        <div className="admin-mini-list">
+          {admins.slice(0, 5).map((a) => (
+            <div className="admin-mini-row" key={a._id}>
+              <span className="admin-avatar-circle">{initials(a.name)}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{a.name}</div>
+                <div className="text-sm text-muted">{a.role || "Administrator"}</div>
+              </div>
+              <span className={`badge ${a.isActive ? "badge-green" : "badge-red"}`}>
+                {a.isActive ? "Active" : "Suspended"}
+              </span>
+            </div>
+          ))}
+          {admins.length === 0 && (
+            <div className="empty-state-sub" style={{ textAlign: "center", padding: 20 }}>
+              No admins yet
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pharmacy owners */}
+      <div className="card section-block">
+        <div className="section-header">
+          <div className="section-title">Pharmacy Owners</div>
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{ textTransform: "uppercase", fontSize: 11 }}
+            onClick={() => navigate("/pharmacies")}
+          >
+            View all
+          </button>
+        </div>
+        <div className="admin-mini-list">
+          {pharmacyOwners.slice(0, 5).map((p) => (
+            <div className="admin-mini-row" key={p.owner._id || p.owner.email}>
+              <span className="admin-avatar-circle owner-avatar">{initials(p.owner.name)}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 13 }}>{p.owner.name}</div>
+                <div className="text-sm text-muted">{p.name}</div>
+              </div>
+              <span className={`badge ${p.isActive ? "badge-green" : "badge-red"}`}>
+                {p.isActive ? "Active" : "Suspended"}
+              </span>
+            </div>
+          ))}
+          {pharmacyOwners.length === 0 && (
+            <div className="empty-state-sub" style={{ textAlign: "center", padding: 20 }}>
+              No pharmacy owners yet
+            </div>
+          )}
         </div>
       </div>
     </div>
